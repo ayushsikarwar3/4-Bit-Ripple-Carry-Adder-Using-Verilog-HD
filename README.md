@@ -214,3 +214,12 @@ By the end of this project, you will have developed an understanding of:
 # Conclusion
 
 The 4-bit Ripple Carry Adder is a one of the simplest arithmetic circuits in digital electronics. Its carry propagation delay is a limitation for large bit-width operations, but its simplicity, modularity and ease of implementation make it an ideal vehicle with which to learn digital design concepts. The use of the RCA in Verilog HDL gives hands-on experience with hardware description languages, simulation, and combinational circuit design which will be useful for future advanced VLSI, FPGA, and digital system design.
+
+# Author
+
+- Ayush Sikarwar|btech electronics and communication
+- linkedin-https://www.linkedin.com/in/ayush-sikarwar-a89878413?utm_source=share_via&utm_content=profile&utm_medium=member_android
+
+# License
+
+This project is licensed under the MIT License.
