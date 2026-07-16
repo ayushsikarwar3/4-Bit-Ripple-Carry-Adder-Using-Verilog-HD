@@ -4,7 +4,7 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Status](https://img.shields.io/badge/status-simulated-brightgreen)
 
-A structural Verilog implementation of a 4-bit Ripple Carry Adder (RCA), built by cascading four 1-bit Full Adders. Includes a self-checking testbench and simulation results from ModelSim.
+A structural Verilog implementation of a 4-bit Ripple Carry Adder (RCA), built by cascading four 1-bit Full Adders. Includes a self-checking testbench (verified against a reference `A + B + Cin` model) and simulation results.
 
 ## Overview
 
@@ -19,12 +19,15 @@ This project implements, simulates, and verifies a 4-bit RCA in Verilog HDL, and
 ## Repository Structure
 
 ```
-├── 4-Bit Ripple Carry Adde.v     # Full Adder + Ripple Carry Adder modules
-├── testbench.v                    # Testbench with 7 stimulus vectors
-├── simulation screenshot.png      # ModelSim waveform & transcript
+├── full_adder.v                   # 1-bit Full Adder (sum/carry logic)
+├── ripple_carry_adder_4bit.v      # Top-level 4-bit RCA (instantiates 4x full_adder)
+├── testbench.v                    # Self-checking testbench (7 vectors, PASS/FAIL report)
+├── simulation screenshot.png      # Simulation waveform & transcript
 ├── LICENSE
 └── README.md
 ```
+
+> **Note:** the design is split into `full_adder.v` and `ripple_carry_adder_4bit.v` so it compiles standalone — `ripple_carry_adder_4bit` instantiates `full_adder`, so both files must be compiled together.
 
 ## Design
 
@@ -43,7 +46,7 @@ Each Full Adder computes:
 
 `Sum = A ⊕ B ⊕ Cin`, `Cout = (A·B) + (B·Cin) + (A·Cin)`
 
-Top-level module port list ([full source](./4-Bit%20Ripple%20Carry%20Adde.v)):
+Top-level module port list ([full source](./ripple_carry_adder_4bit.v)):
 
 ```verilog
 module ripple_carry_adder_4bit(
@@ -59,7 +62,7 @@ module ripple_carry_adder_4bit(
 
 ### ModelSim / QuestaSim
 ```bash
-vlog "4-Bit Ripple Carry Adde.v" testbench.v
+vlog full_adder.v ripple_carry_adder_4bit.v testbench.v
 vsim work.ripple_carry_adder_4bit_tb
 add wave *
 run 100 ns
@@ -67,18 +70,31 @@ run 100 ns
 
 ### Icarus Verilog (open source, cross-platform)
 ```bash
-iverilog -o rca_sim "4-Bit Ripple Carry Adde.v" testbench.v
+iverilog -o rca_sim full_adder.v ripple_carry_adder_4bit.v testbench.v
 vvp rca_sim
 ```
 
 ### Vivado / Quartus
-Add both `.v` files to a new project, set `ripple_carry_adder_4bit` as the top module for synthesis, or the testbench as the top module for behavioral simulation.
+Add all three `.v` files to a new project. Set `ripple_carry_adder_4bit` as the top module for synthesis, or `ripple_carry_adder_4bit_tb` as the top module for behavioral simulation.
 
 ## Results
 
-Simulated in ModelSim across 7 test vectors covering zero inputs, simple addition, mid-chain carry generation, and all-ones overflow. All outputs matched expected binary addition results.
+The testbench applies 7 stimulus vectors (zero inputs, simple addition, mid-chain carry generation, and an all-ones overflow case) and compares each output against a reference `A + B + Cin` calculation, printing `PASS`/`FAIL` per vector and a final `ALL TESTS PASSED` summary. Verified with Icarus Verilog — all 7 vectors pass:
+
+```
+PASS: A=0000 B=0000 Cin=0 | Sum=0000 Cout=0
+PASS: A=0001 B=0001 Cin=0 | Sum=0010 Cout=0
+PASS: A=0010 B=0011 Cin=0 | Sum=0101 Cout=0
+PASS: A=0101 B=0011 Cin=0 | Sum=1000 Cout=0
+PASS: A=1111 B=0001 Cin=0 | Sum=0000 Cout=1
+PASS: A=1010 B=0101 Cin=1 | Sum=0000 Cout=1
+PASS: A=1111 B=1111 Cin=0 | Sum=1110 Cout=1
+ALL TESTS PASSED
+```
 
 ![Simulation waveform](./simulation%20screenshot.png)
+
+> **Note:** the screenshot above is from an earlier version of this design (different file/module/signal names). Re-run the steps above and swap in a fresh waveform screenshot so it matches the current source exactly.
 
 ## Advantages & Limitations
 
